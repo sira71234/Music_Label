@@ -1,5 +1,10 @@
+import database
+
 print("\n________Sahel Sound Records________\n")
 def menu():
+
+    inventaire = database.charger()
+    
     print("1. Consulter le catalogue")
     print("2. Ajouter un artiste")
     print("3. Ajouter un album a un artiste existant")
@@ -17,7 +22,7 @@ def main():
                     print("______Catalogue______")
                     print("1. Afficher tous les artistes")
                     print("2. Rechercher un artiste par nom et par genre")
-                    print("3.Afficherles details d'un artiste")
+                    print("3.Afficher les details d'un artiste")
                     print("4. Retour au menu principal")
                     sub_choice = input("Veuillez choisir une option (1-4): ").strip()
                     match sub_choice:
