@@ -1,21 +1,29 @@
-# Analyste et Qualité 
+# stats.py — Personne 5 : Analyste & Qualité
+import database
 import pandas as pd
-import json
 
 
-def charger_json(chemin="catalogue.json"):
+def test_pandas():
     """
-    Charge le fichier JSON et retourne la liste des artistes.
+    Récupère les données depuis database.py et les analyse avec Pandas.
     """
-    with open(chemin, encoding="utf-8") as f:
-        return json.load(f)
+    donnees = database.charger()
+
+    if not donnees:
+        print(" La liste est vide, rien à afficher.")
+        return None
+
+    df = pd.DataFrame(donnees)
+    print(" Pandas fonctionne ! Voici un aperçu :\n")
+    print(df.head())
+    return df
 
 
-def aplatir_albums(catalogue):
+def aplatir_albums():
     """
-    Transforme la liste des artistes en une liste de lignes
-    une ligne par album avec les infos de l'artiste.
+    Aplatit les albums pour avoir une ligne par album.
     """
+    catalogue = database.charger()
     lignes = []
     for artiste in catalogue:
         for album in artiste["albums"]:
@@ -43,8 +51,7 @@ def top5_artistes(df):
         .sort_values(ascending=False)
         .head(5)
         .reset_index()
-    ) 
-
+    )
     top5.columns = ["Artiste", "Total Streams"]
     print(top5.to_string(index=False))
     return top5
@@ -72,7 +79,7 @@ def albums_par_annee(df):
     """
     Retourne le nombre d'albums sortis par année.
     """
-    print("\nNOMBRE D'ALBUMS PAR ANNÉE :")
+    print("\n NOMBRE D'ALBUMS PAR ANNÉE :")
     print("─" * 40)
     par_annee = (
         df.groupby("annee")["titre"]
@@ -96,21 +103,25 @@ def generer_rapport_complet():
     """
     Fonction principale qui génère toutes les statistiques.
     """
-    print("GÉNÉRATION DU RAPPORT COMPLET...")
+    print(" GÉNÉRATION DU RAPPORT COMPLET...")
     print("═" * 40)
 
-    catalogue = charger_json()
-    lignes = aplatir_albums(catalogue)
+    # On aplatit les albums
+    lignes = aplatir_albums()
     df = pd.DataFrame(lignes)
 
+    # Statistiques
     top5_artistes(df)
     moyenne_streams_par_genre(df)
     albums_par_annee(df)
+
+    # Export CSV
     exporter_rapport(df)
 
     return df
 
 
-# Résultat
+# --- Lancement ---
 if __name__ == "__main__":
+    test_pandas()
     generer_rapport_complet()
