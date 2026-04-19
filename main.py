@@ -1,13 +1,11 @@
-import database
+import logic
+import stats
 
-print("\n________Sahel Sound Records________\n")
 def menu():
-
-    inventaire = database.charger()
-    
-    print("1. Consulter le catalogue")
-    print("2. Ajouter un artiste")
-    print("3. Ajouter un album a un artiste existant")
+    print("\n________Sahel Sound Records________\n")
+    print("1. Catalogue des artistes et albums")
+    print("2. Gestionnaire d'artistes")
+    print("3. Gestionnaire d'albums")
     print("4. Statistiques et rapport")
     print("5. Quitter l'application")
 
@@ -28,6 +26,7 @@ def main():
                     match sub_choice:
                         case '1':
                             print("______Affichage de tous les artistes______")
+                            logic.afficher_tout()
                             input("Appuyez sur Entrée pour continuer...")
 
                         case '2':
@@ -40,6 +39,7 @@ def main():
                                 match search_choice:
                                     case '1':
                                         print("______Recherche par nom...______")
+                                        logic.rechercher(input("Entrez le nom de l'artiste à rechercher: "))
                                         input("Appuyez sur Entrée pour continuer...")
                                     case '2':
                                         print("______Recherche par genre...______")
@@ -77,6 +77,7 @@ def main():
                             input("Appuyez sur Entrée pour continuer...")
                         case '3':
                             print("______Suppression d'un artiste...______")
+                            logic.supprimer(input("Entrez le nom de l'artiste à supprimer: "))
                             input("Appuyez sur Entrée pour continuer...")
                         case '4':
                             break
@@ -118,15 +119,22 @@ def main():
                     match sub_choice:
                         case '1':
                             print("______Consulter le top 5 des artistes les plus populaires...______")
+                            df = stats.pd.DataFrame(stats.aplatir_albums())
+                            stats.top5_artistes(df)
                             input("Appuyez sur Entrée pour continuer...")
                         case '2':
                             print("______Consulter la moyenne des streams par genre musical...______")
+                            starts = stats.pd.DataFrame(stats.aplatir_albums())
+                            stats.moyenne_streams_par_genre(starts)
                             input("Appuyez sur Entrée pour continuer...")
                         case '3':
                             print("______Consulter le nombre total d'albums sortis par année...______")
+                            starts = stats.pd.DataFrame(stats.aplatir_albums())
+                            stats.albums_par_annee(starts)
                             input("Appuyez sur Entrée pour continuer...")
                         case '4':
                             print("______Rapport complet...______")
+                            stats.generer_rapport_complet()
                             input("Appuyez sur Entrée pour continuer...")
                         case '5':
                             break

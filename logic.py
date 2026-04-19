@@ -1,12 +1,17 @@
-inventaire = []
+import database
 
 def ajouter(dictionnaire):
     #Ajoute un dictionnaire (artiste/album) dans l'inventaire.
-    inventaire.append(dictionnaire)
+    catalogue = database.charger()
+
+
+    database.sauvegarder(nouvel_artiste)
     print(f"'{dictionnaire.get('nom', 'Élément')}' ajouté avec succès !")
 
 
 def afficher_tout():
+
+    inventaire = database.charger()
     #Affiche tous les éléments stockés dans l'inventaire.
     if not inventaire:
         print("L'inventaire est vide pour l'instant.")
@@ -20,8 +25,10 @@ def afficher_tout():
     print("=================================\n")
 
 def supprimer(nom):
-    #Supprime un artiste de l'inventaire selon son nom.
+
     global inventaire
+    inventaire = database.charger()
+    #Supprime un artiste de l'inventaire selon son nom.
     avant = len(inventaire)
     inventaire = [e for e in inventaire if e.get("nom") != nom]
     if len(inventaire) < avant:
@@ -38,21 +45,3 @@ def rechercher(nom):
             print(r)
     else:
         print(f"Aucun résultat pour {nom}.")
-
-
-if __name__ == "__main__":
-
-    # On simule l'ajout de quelques artistes
-    ajouter({"nom": "Fally Ipupa", "genre": "Afrobeat", "pays": "RDC"})
-    ajouter({"nom": "Burna Boy", "genre": "Afrobeat", "pays": "Nigeria"})
-    ajouter({"nom": "Aya Nakamura", "genre": "Afropop", "pays": "Mali"})
-
-    # On affiche tout
-    afficher_tout()
-
-    # On teste la recherche
-    rechercher("burna")
-
-    # On teste la suppression
-    supprimer("Fally Ipupa")
-    afficher_tout()
