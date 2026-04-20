@@ -5,57 +5,58 @@ from typing import Any
 NOM_FICHIER = Path("donnees.json")
 
 
-# =========================
-# NORMALISATION
-# =========================
+def _normalize_item(item: Any) -> dict:
+    if isinstance(item, dict):
+        return item
+    return {"valeur": item}
+
+
 def _normalize_data(data: Any) -> list[dict]:
     if isinstance(data, list):
-        return data
-    if isinstance(data, dict):
-        return [data]
-    return [{"valeur": data}]
+        return [_normalize_item(item) for item in data]
+    return [_normalize_item(data)]
 
 
-# =========================
-# CHARGER
-# =========================
 def charger(path: Path = NOM_FICHIER, verbose: bool = False) -> list[dict]:
+    path = Path(path)
+
     if not path.exists():
         return []
 
-    contenu = path.read_text(encoding="utf-8").strip()
+    try:
+        contenu = path.read_text(encoding="utf-8").strip()
+    except OSError:
+        return []
 
     if not contenu:
         return []
 
     try:
-        return _normalize_data(json.loads(contenu))
+        donnees = json.loads(contenu)
+        resultat = _normalize_data(donnees)
     except json.JSONDecodeError:
-        lignes = [l for l in contenu.splitlines() if l.strip()]
-        return [{"valeur": l} for l in lignes]
+        lignes = [ligne for ligne in contenu.splitlines() if ligne.strip()]
+        resultat = [{"valeur": ligne} for ligne in lignes]
+
+    if verbose:
+        print(f"{len(resultat)} element(s) charge(s) depuis '{path}'.")
+
+    return resultat
 
 
-# =========================
-# SAUVEGARDE 
-# =========================
 def sauvegarder(
     data: list[dict] | dict,
     path: Path = NOM_FICHIER,
-    verbose: bool = False
+    verbose: bool = False,
 ) -> None:
-    """Ajoute toujours les données sans jamais écraser."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
 
-    ancien = charger(path)
-
-    if isinstance(data, dict):
-        ancien.append(data)
-    else:
-        ancien.extend(_normalize_data(data))
-
+    donnees = _normalize_data(data)
     path.write_text(
-        json.dumps(ancien, ensure_ascii=False, indent=4),
-        encoding="utf-8"
+        json.dumps(donnees, ensure_ascii=False, indent=4),
+        encoding="utf-8",
     )
 
     if verbose:
-        print(f"Données ajoutées dans '{path}'")
+        print(f"Donnees sauvegardees dans '{path}'.")
